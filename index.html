@@ -1,130 +1,152 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <title>Stlite app</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.89.1/build/stlite.css"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module">
-import { mount } from "https://cdn.jsdelivr.net/npm/@stlite/browser@0.89.1/build/stlite.js"
-mount(
-  {
-    requirements: [],
-    entrypoint: "streamlit_app.py",
-    files: {
-"streamlit_app.py": `import math
-from random import shuffle
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎅🏻 Secret Santa 2025</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #e63946, #f1faee);
+      color: #1d3557;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    h1 {
+      margin-top: 30px;
+      font-size: 2.2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      font-size: 1rem;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #457b9d;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #1d3557;
+    }
+    .hidden { display: none; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .result {
+      margin-top: 20px;
+      background: #a8dadc;
+      padding: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎅🏻 Secret Santa 2025 🎅🏻</h1>
+  <div class="container">
+    <!-- Schermata passcode -->
+    <div id="login">
+      <p>Inserisci il passcode per accedere all'applicazione!</p>
+      <input type="password" id="passcode" placeholder="Passcode segreto">
+      <br>
+      <button onclick="checkPassword()">Entra 🎄</button>
+      <p id="error" style="color:red;"></p>
+    </div>
 
-import streamlit as st
+    <!-- Schermata principale -->
+    <div id="main" class="hidden">
+      <label for="yourName"><b>Chi sei?</b></label><br>
+      <select id="yourName">
+        <option value="">Seleziona il tuo nome</option>
+      </select>
 
-PSW = "0O,#36If'7"
+      <div id="grid" class="grid"></div>
+      <div id="result" class="result hidden"></div>
+    </div>
+  </div>
 
-VIP_PEOPLE = [
-    "Andrea Maccagni",
-    "Greta Mazza",
-]
+  <script>
+    const PSW = "0O,#36If'7";
 
-PEOPLE = [
-    "Umberto Maggiorelli",
-    "Alberto Ugolotti",
-    "Andrea Cocchi",
-    "Andrea D'Onghia",
-    "Carlotta Zamagni",
-    "Diego Zamagni",
-    "Edoardo Giuberti",
-    "Lorenzo Zaniboni",
-    "Luca Poletti",
-    "Martina Montani",
-    "Matteo Pizzamiglio",
-    "Sara Fabbri",
-    "Sofia Lanzi",
-    "Veronica Maestri",
-]
+    const VIP_PEOPLE = ["Andrea Maccagni", "Greta Mazza"];
+    const PEOPLE = [
+      "Umberto Maggiorelli", "Alberto Ugolotti", "Andrea Cocchi", "Andrea D'Onghia",
+      "Carlotta Zamagni", "Diego Zamagni", "Edoardo Giuberti", "Lorenzo Zaniboni",
+      "Luca Poletti", "Martina Montani", "Matteo Pizzamiglio", "Sara Fabbri",
+      "Sofia Lanzi", "Veronica Maestri"
+    ];
 
-if "passcode" not in st.session_state:
-    st.session_state.passcode = ""
+    // Shuffle array
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
 
-if "people" not in st.session_state:
-    shuffle(PEOPLE)
-    st.session_state.people = VIP_PEOPLE + PEOPLE
+    const allPeople = [...VIP_PEOPLE, ...PEOPLE]  // [...VIP_PEOPLE, ...shuffle([...PEOPLE])];
+    const gridPeople = shuffle([...VIP_PEOPLE, ...PEOPLE]);
 
-if "grid" not in st.session_state:
-    grid_shuffled = VIP_PEOPLE.copy() + PEOPLE.copy()
-    shuffle(grid_shuffled)
-    st.session_state.grid = grid_shuffled
+    // Popola select
+    const select = document.getElementById("yourName");
+    allPeople.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.textContent = p;
+      select.appendChild(opt);
+    });
 
-st.set_page_config(page_title="Secret Santa", page_icon="🎅🏻", layout="wide")
-st.title("🎅🏻 Secret Santa 2025 🎅🏻")
+    // Login
+    function checkPassword() {
+      const entered = document.getElementById("passcode").value;
+      const error = document.getElementById("error");
+      if (entered === PSW) {
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("main").classList.remove("hidden");
+      } else {
+        error.textContent = "❌ Passcode errato, riprova!";
+      }
+    }
 
+    // Crea griglia
+    const gridDiv = document.getElementById("grid");
+    gridPeople.forEach(name => {
+      const btn = document.createElement("button");
+      btn.textContent = name;
+      btn.onclick = () => revealGift(name);
+      btn.disabled = true;
+      gridDiv.appendChild(btn);
+    });
 
-def on_click_button(key: str) -> None:
-    n_people = len(st.session_state.people)
-    idx = st.session_state.people.index(key)
-    present_to = st.session_state.people[(idx + 1) % n_people]
-    st.info(f"{key} devi fare il regalo a: **{present_to}**")
+    // Abilita il bottone solo per il nome scelto
+    select.addEventListener("change", e => {
+      const chosen = e.target.value;
+      gridDiv.querySelectorAll("button").forEach(b => {
+        b.disabled = (b.textContent !== chosen);
+      });
+      document.getElementById("result").classList.add("hidden");
+    });
 
-
-if st.session_state.passcode != PSW:
-    if st.session_state.passcode == "":
-        st.warning("Inserisci il passcode per accedere all'applicazione!")
-    else:
-        st.error("Il passcode inserito è errato, riprova")
-    psw = st.text_input(
-        label="Passcode",
-        type="password",
-        help="Per accedere al Secret Santa 2025 utilizza la password fornita dall'amministratore",
-        placeholder="Inserisci il passcode",
-        icon=":material/passkey:"
-    ) # type: ignore
-    st.session_state.passcode = psw
-    st.rerun()
-
-all_people = st.session_state.grid
-
-your_name = st.selectbox(
-    label="Chi sei?",
-    options=all_people,
-    index=None,
-)
-if your_name:
-    n_cols = 3
-    n_rows = math.ceil(len(all_people) / n_cols)
-
-    for n in range(0, n_rows + 1):
-        cols = st.columns(n_cols)
-        for i, col in enumerate(cols):
-            profile_number = (n * n_cols) + i
-            if profile_number >= len(all_people):
-                continue
-            name = all_people[profile_number]
-            col.button(
-                label=name,
-                key=name,
-                icon=":material/emoji_people:",
-                width="stretch",
-                on_click=on_click_button,
-                args=(name,),
-                disabled=True if your_name != name else False
-            )
-
-`,
-
-},
-  },
-  document.getElementById("root")
-)
-
-    </script>
-  </body>
-  <!-- Generated from Stlite Sharing (https://edit.share.stlite.net/), and the source version is 91d910f343d2955b8e2e0140d9383337861dd54a -->
+    // Mostra il destinatario
+    function revealGift(name) {
+      const idx = allPeople.indexOf(name);
+      const next = allPeople[(idx + 1) % allPeople.length];
+      const res = document.getElementById("result");
+      res.innerHTML = `<b>${name}</b> deve fare il regalo a <b>${next}</b> 🎁`;
+      res.classList.remove("hidden");
+    }
+  </script>
+</body>
 </html>
